@@ -1,5 +1,6 @@
 ## Qu'est-ce que l'ART ANOVA ?
 <b>L'ART ANOVA (Aligned Rank Transform ANOVA</b> est une méthode statistique non paramétrique pour l'ANOVA factorielle. Elle permet d'analyser les effets principaux ET les interactions entre plusieurs facteurs, même si les données ne sont pas normalement distribuées.
+[Description complète ici](https://meddatamuse.github.io/ART_Anova/)
 
 ### Pourquoi l'Utiliser ?
 Données Non Normales 📈
