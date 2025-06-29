@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographie : L'ANOVA Non Paramétrique (ART ANOVA)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- 
+    Palette Name: Brilliant Blues (selected for vibrancy)
+    HEX Codes: #005F73 (Dark Teal), #0A9396 (Teal), #94D2BD (Light Teal), #EE9B00 (Orange), #CA6702 (Burnt Orange)
+    -->
+    <!-- 
+    Narrative Plan:
+    1.  Introduction: Define Aligned Rank Transform (ART) ANOVA and its purpose for factorial designs.
+    2.  Why ART ANOVA?: Explain when to use it, especially for non-normal data with interactions.
+    3.  How ART ANOVA Works: Simplified process flow (Align -> Rank -> ANOVA).
+    4.  Conceptual Data Transformation: Chart.js plot showing data before and after conceptual alignment.
+    5.  Advantages and Considerations: Summarize pros and cons, including recent research caveats.
+    6.  Conclusion: Reiterate the role of ART ANOVA in statistical analysis.
+    -->
+    <!-- 
+    Visualization Choices (NO SVG, NO MERMAID):
+    -   Conceptual Data Transformation: Scatter Plot (Chart.js Canvas) to show alignment. Goal: Inform/Organize. Confirmed: NO SVG.
+    -   How It Works Flow: Structured HTML/CSS. Goal: Organize. Confirmed: NO SVG, NO MERMAID.
+    -   Advantages/Considerations: Styled HTML lists with Unicode icons. Goal: Inform. Confirmed: NO SVG, NO MERMAID.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F4F8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .flow-step {
+            background-color: #94D2BD;
+            color: #005F73;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+        .flow-arrow {
+            color: #0A9396;
+            font-weight: bold;
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center my-8 md:my-16">
+            <h1 class="text-5xl md:text-7xl font-black text-[#005F73] tracking-tight">ART ANOVA</h1>
+            <p class="text-xl md:text-2xl mt-4 text-[#0A9396]">Analyse Factorielle Non Paramétrique Avancée</p>
+        </header>
+
+        <section class="mb-16">
+            <div class="text-center max-w-4xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-[#005F73] mb-4">Qu'est-ce que l'ART ANOVA ?</h2>
+                <p class="text-lg text-gray-700">
+                    L'ART ANOVA (Aligned Rank Transform ANOVA) est une approche non paramétrique pour l'Analyse de Variance (ANOVA) factorielle. Contrairement aux tests non paramétriques simples comme Kruskal-Wallis ou Friedman, ART ANOVA permet d'analyser non seulement les effets principaux mais aussi les **effets d'interaction** entre plusieurs facteurs, ce qui est crucial dans les plans expérimentaux complexes.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-xl p-8">
+                <h3 class="text-2xl font-bold text-[#0A9396] mb-6 text-center">Quand Utiliser l'ART ANOVA ?</h3>
+                <p class="text-center text-gray-700 mb-8 max-w-4xl mx-auto">
+                    L'ART ANOVA est une alternative précieuse lorsque vos données ne respectent pas les hypothèses de l'ANOVA paramétrique traditionnelle, tout en permettant l'étude des interactions.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div class="space-y-4">
+                        <div class="flex items-start bg-[#94D2BD] bg-opacity-30 p-4 rounded-lg shadow-sm">
+                            <span class="text-2xl text-[#005F73] mr-4">📊</span>
+                            <div>
+                                <h4 class="font-bold text-xl text-[#005F73]">Violations des Hypothèses</h4>
+                                <p class="text-gray-700">Vos données ne sont pas normalement distribuées ou présentent une hétérogénéité des variances, invalidant l'ANOVA paramétrique.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start bg-[#94D2BD] bg-opacity-30 p-4 rounded-lg shadow-sm">
+                            <span class="text-2xl text-[#005F73] mr-4">↔️</span>
+                            <div>
+                                <h4 class="font-bold text-xl text-[#005F73]">Analyse des Interactions</h4>
+                                <p class="text-gray-700">Vous avez un plan factoriel et souhaitez étudier les effets d'interaction entre vos variables indépendantes.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start bg-[#94D2BD] bg-opacity-30 p-4 rounded-lg shadow-sm">
+                            <span class="text-2xl text-[#005F73] mr-4">🔢</span>
+                            <div>
+                                <h4 class="font-bold text-xl text-[#005F73]">Données Ordinales / Likert</h4>
+                                <p class="text-gray-700">Courant dans les enquêtes, où les échelles ordinales peuvent violer les hypothèses de normalité.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="chart-container flex items-center justify-center bg-gray-50 rounded-lg p-4 shadow-inner">
+                        <canvas id="conceptualAlignmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16 bg-white rounded-lg shadow-xl p-8">
+            <h2 class="text-3xl font-bold text-center text-[#005F73] mb-8">Comment Fonctionne l'ART ANOVA ? (Simplifié)</h2>
+            <p class="text-center text-lg text-gray-700 max-w-4xl mx-auto mb-8">
+                Le processus ART ANOVA transforme vos données brutes en rangs "alignés", sur lesquels une ANOVA standard est ensuite appliquée.
+            </p>
+            <div class="flex flex-col items-center justify-center">
+                <div class="flow-step w-full max-w-xs">
+                    1. ALIGNEMENT DES DONNÉES
+                    <span class="text-sm block mt-2">(Pour chaque effet, soustraire les autres effets estimés de la réponse brute)</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step w-full max-w-xs">
+                    2. CLASSEMENT (RANKS)
+                    <span class="text-sm block mt-2">(Attribuer des rangs aux données alignées, en gérant les ex æquo)</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step w-full max-w-xs">
+                    3. ANOVA PARAMÉTRIQUE
+                    <span class="text-sm block mt-2">(Effectuer une ANOVA classique sur les rangs alignés pour tester chaque effet)</span>
+                </div>
+            </div>
+        </section>
+        
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-[#005F73] mb-8">Avantages et Considérations</h2>
+            <p class="text-center text-lg text-gray-700 max-w-4xl mx-auto mb-8">
+                ART ANOVA offre des capacités uniques mais il est important de connaître ses nuances et les débats récents.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-xl font-bold text-[#0A9396] mb-3">Avantages Clés ✔️</h3>
+                    <ul class="list-none space-y-2">
+                        <li class="flex items-start"><span class="text-2xl text-[#0A9396] mr-3">✔️</span> <div>**Interactions :** Permet d'analyser les effets d'interaction dans un cadre non paramétrique.</div></li>
+                        <li class="flex items-start"><span class="text-2xl text-[#0A9396] mr-3">✔️</span> <div>**Robustesse :** Tolère les violations des hypothèses de normalité et d'homogénéité des variances.</div></li>
+                        <li class="flex items-start"><span class="text-2xl text-[#0A9396] mr-3">✔️</span> <div>**Accessibilité :** Peut être implémenté avec des procédures ANOVA standard après la transformation.</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-xl font-bold text-[#CA6702] mb-3">Points à Considérer ⚠️</h3>
+                    <ul class="list-none space-y-2">
+                        <li class="flex items-start"><span class="text-2xl text-[#CA6702] mr-3">⚠️</span> <div>**Complexité :** L'interprétation peut être moins directe qu'avec l'ANOVA paramétrique.</div></li>
+                        <li class="flex items-start"><span class="text-2xl text-[#CA6702] mr-3">⚠️</span> <div>**Débats Récents :** Des études récentes suggèrent que ART peut parfois "confondre" les effets ou avoir un taux d'erreur de Type I gonflé sous certaines conditions.</div></li>
+                        <li class="flex items-start"><span class="text-2xl text-[#CA6702] mr-3">⚠️</span> <div>**Alternatives :** La transformation simple des rangs ou la transformation normale inverse pourraient être plus robustes dans certains cas.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center py-8 border-t border-gray-300">
+            <p class="text-lg font-bold text-[#005F73]">ART ANOVA : Un outil puissant, à utiliser avec une compréhension approfondie de ses principes et limites.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function wrapLabel(str, maxWidth) {
+            if (str.length <= maxWidth) {
+                return str;
+            }
+            const words = str.split(' ');
+            let lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + ' ' + words[i]).length > maxWidth) {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                } else {
+                    currentLine += ' ' + words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+        
+        const sharedTooltipOptions = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        const ctx = document.getElementById('conceptualAlignmentChart').getContext('2d');
+        const conceptualAlignmentChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Données Originales (Non Alignées)',
+                        data: [
+                            {x: 1, y: 15}, {x: 2, y: 22}, {x: 3, y: 18}, {x: 4, y: 25}, {x: 5, y: 30},
+                            {x: 1, y: 10}, {x: 2, y: 18}, {x: 3, y: 15}, {x: 4, y: 20}, {x: 5, y: 28},
+                            {x: 1, y: 8}, {x: 2, y: 14}, {x: 3, y: 12}, {x: 4, y: 17}, {x: 5, y: 23}
+                        ],
+                        backgroundColor: '#EE9B00',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'Données Conceptuellement Alignées',
+                        data: [
+                            {x: 1, y: 12}, {x: 2, y: 19}, {x: 3, y: 16}, {x: 4, y: 23}, {x: 5, y: 28},
+                            {x: 1, y: 12}, {x: 2, y: 19}, {x: 3, y: 16}, {x: 4, y: 23}, {x: 5, y: 28},
+                            {x: 1, y: 12}, {x: 2, y: 19}, {x: 3, y: 16}, {x: 4, y: 23}, {x: 5, y: 28}
+                        ],
+                        backgroundColor: '#0A9396',
+                        pointStyle: 'rectRot',
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }
+                ]
+            },
+            options: {
+                ...sharedTooltipOptions,
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Facteur X (Ex: Temps/Niveau)'
+                        },
+                        ticks: {
+                            display: false
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Mesure de Réponse'
+                        },
+                        ticks: {
+                            display: false
+                        },
+                         grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    ...sharedTooltipOptions.plugins,
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
