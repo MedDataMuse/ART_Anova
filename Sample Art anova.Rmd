@@ -1,0 +1,117 @@
+---
+title: "Untitled"
+author: "Séhomi"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r}
+# Ce script R démontre comment effectuer une ART ANOVA sur les données fournies.
+# Il utilise le package 'ARTool' pour la transformation des rangs alignés.
+
+# 1. Installation et chargement des packages nécessaires
+# Si 'ARTool' n'est pas déjà installé, décommentez la ligne suivante et exécutez-la :
+# install.packages("ARTool")
+library(ARTool)
+# Si 'dplyr' n'est pas déjà installé, décommentez la ligne suivante et exécutez-la :
+# install.packages("dplyr")
+library(dplyr) # Pour la manipulation des données, si nécessaire
+
+# 2. Création du jeu de données à partir de la table fournie
+# Nous allons créer un data frame R directement à partir des données.
+data_art <- data.frame(
+  Pid = c(rep("P01", 4), rep("P02", 4), rep("P03", 4), rep("P04", 4),
+          rep("P05", 4), rep("P06", 4), rep("P07", 4), rep("P08", 4)),
+  Groupe = c(rep("A", 16), rep("B", 16)),
+  Mesure = rep(c("M1", "M2", "M3", "M4"), 8),
+  Var1 = c(7.2, 6.8, 7.5, 7.0, 8.1, 7.9, 8.5, 8.0, 5.5, 5.8, 5.2, 5.7, 6.5, 6.2, 6.7, 6.3,
+           4.0, 4.3, 3.8, 4.1, 5.0, 5.2, 4.8, 5.1, 3.5, 3.7, 3.3, 3.6, 4.5, 4.7, 4.3, 4.6),
+  Var2 = c(15, 14, 16, 15, 18, 17, 19, 18, 10, 11, 9, 10, 13, 12, 14, 13,
+           8, 9, 7, 8, 10, 11, 9, 10, 6, 7, 5, 6, 9, 10, 8, 9),
+  Var3 = c(2.1, 2.5, 2.0, 2.3, 3.0, 3.2, 2.8, 3.1, 1.5, 1.7, 1.4, 1.6, 1.9, 2.0, 1.8, 2.1,
+           1.0, 1.2, 0.9, 1.1, 1.3, 1.5, 1.2, 1.4, 0.8, 1.0, 0.7, 0.9, 1.1, 1.3, 1.0, 1.2)
+)
+```
+
+
+
+```{r}
+
+write.csv2(data_art, file="data_art.csv")
+data_art<-read.csv2("data_art.csv")
+
+```
+
+
+```{r}
+# Assurez-vous que les variables catégorielles sont des facteurs
+data_art$Pid <- as.factor(data_art$Pid)
+data_art$Groupe <- as.factor(data_art$Groupe)
+data_art$Mesure <- as.factor(data_art$Mesure)
+
+# Aperçu des données
+print("Aperçu des données :")
+print(head(data_art))
+print(str(data_art))
+```
+
+
+```{r}
+# 3. Exécution de l'ART ANOVA pour chaque variable quantitative
+
+# --- Analyse pour Var1 ---
+print("\n--- Analyse ART ANOVA pour Var1 ---")
+# La formule inclut l'effet principal du Groupe, l'effet principal de la Mesure,
+# l'interaction Groupe:Mesure, et le terme aléatoire pour les sujets (1|Pid).
+m_art_var1 <- art(Var1 ~ Groupe * Mesure + (1|Pid), data = data_art)
+print("Résumé de la transformation ART pour Var1 :")
+print(summary(m_art_var1))
+
+# Exécution de l'ANOVA sur les données transformées
+# Note : Pour les modèles ART, les tests F sont généralement interprétés.
+anova_var1 <- anova(m_art_var1)
+print("Résultats de l'ANOVA pour Var1 :")
+print(anova_var1)
+```
+
+
+```{r}
+# --- Analyse pour Var2 ---
+print("\n--- Analyse ART ANOVA pour Var2 ---")
+m_art_var2 <- art(Var2 ~ Groupe * Mesure + (1|Pid), data = data_art)
+print("Résumé de la transformation ART pour Var2 :")
+print(summary(m_art_var2))
+anova_var2 <- anova(m_art_var2)
+print("Résultats de l'ANOVA pour Var2 :")
+print(anova_var2)
+
+# --- Analyse pour Var3 ---
+print("\n--- Analyse ART ANOVA pour Var3 ---")
+m_art_var3 <- art(Var3 ~ Groupe * Mesure + (1|Pid), data = data_art)
+print("Résumé de la transformation ART pour Var3 :")
+print(summary(m_art_var3))
+anova_var3 <- anova(m_art_var3)
+print("Résultats de l'ANOVA pour Var3 :")
+print(anova_var3)
+
+# 4. Interprétation des résultats
+# Les tableaux ANOVA affichent les valeurs F et les valeurs p pour chaque effet
+# (Groupe, Mesure, et leur interaction).
+# Une valeur p inférieure à un seuil (ex: 0.05) indique un effet statistiquement significatif.
+# Pour des analyses post-hoc (comparaisons par paires), vous pouvez utiliser la fonction 'art.con'
+# après avoir exécuté 'art'. Par exemple :
+# print("\nComparaisons post-hoc pour l'interaction Groupe:Mesure pour Var1 (si significative) :")
+# print(art.con(m_art_var1, "Groupe:Mesure"))
+
+# N'oubliez pas de vérifier les hypothèses de l'ANOVA sur les données transformées
+# (normalité des résidus et homoscédasticité), bien que l'ART réduise considérablement
+# la sensibilité aux violations de ces hypothèses sur les données brutes.
+
+
+```
+
