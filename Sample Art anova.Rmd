@@ -1,6 +1,6 @@
 ---
-title: "Untitled"
-author: "Séhomi"
+title: "ART ANOVA"
+author: "me"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -28,24 +28,25 @@ data_art<-read.csv2("data_art.csv")
 
 ```
 
-
-```{r}
 # Assurez-vous que les variables catégorielles sont des facteurs
+```{r}
 data_art$Pid <- as.factor(data_art$Pid)
 data_art$Groupe <- as.factor(data_art$Groupe)
 data_art$Mesure <- as.factor(data_art$Mesure)
+```
+
 
 # Aperçu des données
+```{r}
 print("Aperçu des données :")
 print(head(data_art))
 print(str(data_art))
 ```
 
-
-```{r}
-# 3. Exécution de l'ART ANOVA pour chaque variable quantitative
+# Exécution de l'ART ANOVA pour chaque variable quantitative
 
 # --- Analyse pour Var1 ---
+```{r}
 print("\n--- Analyse ART ANOVA pour Var1 ---")
 # La formule inclut l'effet principal du Groupe, l'effet principal de la Mesure,
 # l'interaction Groupe:Mesure, et le terme aléatoire pour les sujets (1|Pid).
@@ -60,9 +61,8 @@ print("Résultats de l'ANOVA pour Var1 :")
 print(anova_var1)
 ```
 
-
+# Analyse pour Var2 
 ```{r}
-# --- Analyse pour Var2 ---
 print("\n--- Analyse ART ANOVA pour Var2 ---")
 m_art_var2 <- art(Var2 ~ Groupe * Mesure + (1|Pid), data = data_art)
 print("Résumé de la transformation ART pour Var2 :")
@@ -70,8 +70,10 @@ print(summary(m_art_var2))
 anova_var2 <- anova(m_art_var2)
 print("Résultats de l'ANOVA pour Var2 :")
 print(anova_var2)
+```
 
-# --- Analyse pour Var3 ---
+# Analyse pour Var3
+```{r}
 print("\n--- Analyse ART ANOVA pour Var3 ---")
 m_art_var3 <- art(Var3 ~ Groupe * Mesure + (1|Pid), data = data_art)
 print("Résumé de la transformation ART pour Var3 :")
@@ -80,19 +82,18 @@ anova_var3 <- anova(m_art_var3)
 print("Résultats de l'ANOVA pour Var3 :")
 print(anova_var3)
 
-# 4. Interprétation des résultats
-# Les tableaux ANOVA affichent les valeurs F et les valeurs p pour chaque effet
-# (Groupe, Mesure, et leur interaction).
-# Une valeur p inférieure à un seuil (ex: 0.05) indique un effet statistiquement significatif.
-# Pour des analyses post-hoc (comparaisons par paires), vous pouvez utiliser la fonction 'art.con'
-# après avoir exécuté 'art'. Par exemple :
-# print("\nComparaisons post-hoc pour l'interaction Groupe:Mesure pour Var1 (si significative) :")
-# print(art.con(m_art_var1, "Groupe:Mesure"))
-
-# N'oubliez pas de vérifier les hypothèses de l'ANOVA sur les données transformées
-# (normalité des résidus et homoscédasticité), bien que l'ART réduise considérablement
-# la sensibilité aux violations de ces hypothèses sur les données brutes.
-
-
 ```
+# Interprétation des résultats
+ Les tableaux ANOVA affichent les valeurs F et les valeurs p pour chaque effet
+ (Groupe, Mesure, et leur interaction).
+ Une valeur p inférieure à un seuil (ex: 0.05) indique un effet statistiquement significatif.
+ Pour des analyses post-hoc (comparaisons par paires), vous pouvez utiliser la fonction 'art.con'
+ après avoir exécuté 'art'. Par exemple :
+ print("\nComparaisons post-hoc pour l'interaction Groupe:Mesure pour Var1 (si significative) :")
+ print(art.con(m_art_var1, "Groupe:Mesure"))
+
+ N'oubliez pas de vérifier les hypothèses de l'ANOVA sur les données transformées
+ (normalité des résidus et homoscédasticité), bien que l'ART réduise considérablement
+ la sensibilité aux violations de ces hypothèses sur les données brutes.
+
 
